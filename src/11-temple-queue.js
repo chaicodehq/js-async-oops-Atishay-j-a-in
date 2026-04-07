@@ -125,53 +125,117 @@ export class TempleQueue {
 
   constructor(templeName, maxCapacity) {
     // Your code here
+    this.templeName = templeName 
+  this.#devotees = []
+ this.#maxCapacity = maxCapacity>0?maxCapacity:100
+     this.#vipEnabled = false
   }
 
   get length() {
-    // Your code here
+    return this.#devotees.length
   }
 
   get isEmpty() {
     // Your code here
+    return !this.#devotees.length>0
   }
 
   get vipEnabled() {
     // Your code here
+    return this.#vipEnabled
   }
 
   set vipEnabled(value) {
     // Your code here
+    if(typeof value === "boolean"){
+      this.#vipEnabled=value
+      return
+    }
+    throw TypeError("VIP status must be a boolean")
   }
 
   enqueue(name, type) {
     // Your code here
+    if(["vip","regular"].includes(type)){
+      if(typeof name === "string"){
+        if(name.length){
+          if(this.length<this.#maxCapacity){
+            let devotee={ name, type, joinedAt: new Date().toISOString() }
+            if(devotee.type==="vip" && this.vipEnabled){
+              this.#devotees.unshift(devotee)
+            }
+            else{
+              this.#devotees.push(devotee)
+            }
+            return devotee
+          }
+        }
+      }
+    }
+    return null
   }
 
   dequeue() {
     // Your code here
+    if(this.length===0){
+      return null;
+    }
+    let devotee = this.#devotees.shift()
+    return devotee
   }
 
   peek() {
     // Your code here
+    if(this.length>0){
+      return this.#devotees[0]
+    }
+    return null
   }
 
   contains(name) {
     // Your code here
+    let found = false
+    this.#devotees.forEach((ele)=>{
+      if(ele.name=name){
+        found = true
+      }
+    })
+    return found
   }
 
   toArray() {
     // Your code here
+    return Array.from(this.#devotees)
   }
 
   static merge(queue1, queue2) {
     // Your code here
+    let templeQ= new TempleQueue(`${queue1.templeName}-${queue2.templeName}`,queue1.length + queue2.length)
+    let devotee1= queue1.toArray()
+    let devotee2 = queue2.toArray()
+    devotee1.forEach((ele)=>{
+      templeQ.enqueue(ele.name,ele.type)
+    })
+    devotee2.forEach((ele)=>{
+      templeQ.enqueue(ele.name , ele.type)
+    })
+    return templeQ
+
   }
 
   static fromArray(templeName, maxCapacity, arr) {
     // Your code here
+    let templeQ= new TempleQueue(templeName,maxCapacity)
+    if(Array.isArray(arr)){
+      arr.forEach((ele)=>{
+        templeQ.enqueue(ele,"regular")
+      })
+    }
+    return templeQ
   }
 
   [Symbol.iterator]() {
     // Your code here
+    return this.#devotees[Symbol.iterator]()
   }
 }

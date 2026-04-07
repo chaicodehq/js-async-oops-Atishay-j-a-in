@@ -75,12 +75,73 @@
  */
 export function createSamosaCart(ownerName, location) {
   // Your code here
+  if(typeof ownerName == "string" && typeof location == "string"){
+      let owner = ownerName
+      let menu = {samosa: 15, jalebi: 20, kachori: 25}
+      let sales= []
+      let sellItem = function(itemName, quantity){
+        itemName=itemName.toLowerCase()
+        if( this.menu[itemName] && quantity>0){
+          this.sales.push({ item: itemName, quantity, total: this.menu[itemName] * quantity })
+          return this.menu[itemName] * quantity
+        }
+        return -1
+      }
+      let getDailySales =function(){
+        if(this.sales.length>0){
+
+          let sum= this.sales.reduce((total,price)=>{
+              return total+price.total
+          },0)
+          return sum
+        }
+        return 0
+      }
+      let getPopularItem= function(){
+        if(this.sales.length > 0){
+         let orderNo= {samosa: 0, jalebi: 0, kachori: 0}
+         this.sales.forEach(element => {
+            orderNo[element.item]+=1
+         });
+         orderNo=Object.entries(orderNo)
+         orderNo.sort((a,b)=>b[1]-a[1])
+         return orderNo[0][0]
+        }
+        return null
+      }
+      let moveTo = function(newLocation){
+        if( typeof newLocation!= "string") return null
+        this.location = newLocation
+        return `${this.owner} ka cart ab ${newLocation} pe hai!`
+      }
+      let resetDay = function(){
+        this.sales=[]
+        return `${this.owner} ka naya din shuru!`
+      }
+      return {owner,location,menu,sales,sellItem,getDailySales,getPopularItem,moveTo,resetDay}
+  }
 }
 
 export function demonstrateThisLoss(cart) {
   // Your code here
+  if(typeof cart =="object"){
+    let {sellItem} = cart
+    return sellItem
+  }
+  return null
 }
 
 export function fixWithBind(cart) {
   // Your code here
+   if(typeof cart =="object"){
+     let sellItem = function(itemName, quantity){
+        itemName=itemName.toLowerCase()
+        if( this.menu[itemName] && quantity>0){
+          this.sales.push({ item: itemName, quantity, total: this.menu[itemName] * quantity })
+          return this.menu[itemName] * quantity
+        }
+        return -1
+      }
+    return sellItem.bind(cart)
+  }
 }

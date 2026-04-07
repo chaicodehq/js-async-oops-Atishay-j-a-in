@@ -86,24 +86,86 @@
  */
 export function placeOrder(restaurant, items) {
   // Your code here
+  return new Promise((res, rej) => {
+    if (typeof restaurant == "string" && Array.isArray(items)) {
+      if (restaurant.length > 0 && items.length > 0) {
+        setTimeout(() => {
+          res({
+            orderId: Math.floor(Math.random() * 10000),
+            restaurant,
+            items,
+            status: "placed",
+            timestamp: new Date().toISOString(),
+          });
+        }, 50);
+        return;
+      }
+    }
+
+    rej(new Error("Invalid order details!"));
+  });
 }
 
 export function confirmOrder(order) {
   // Your code here
+  return new Promise((res, rej) => {
+    if (order.orderId && order.status === "placed") {
+      res({ ...order, status: "confirmed", estimatedTime: 30 });
+    }
+    rej(new Error("Order cannot be confirmed!"));
+  });
 }
 
 export function assignRider(order) {
   // Your code here
+  let rider = ["Rahul", "Priya", "Amit", "Neha", "Vikram"];
+  function selectedRider() {
+    return rider[Math.floor(Math.random() * 5)];
+  }
+  return new Promise((res, rej) => {
+    if (order.status) {
+      if (order.status === "confirmed") {
+        res({ ...order, rider: selectedRider(), status: "assigned" });
+      }
+    }
+    rej(new Error("Order not confirmed yet!"));
+  });
 }
 
 export function deliverOrder(order) {
   // Your code here
+  return new Promise((res, rej) => {
+    if (order.status === "assigned" && order.rider) {
+      res({
+        ...order,
+        status: "delivered",
+        deliveredAt: new Date().toISOString(),
+      });
+    }
+    rej(new Error("No rider assigned!"));
+  });
 }
 
 export function processDelivery(restaurant, items) {
   // Your code here
+  return placeOrder(restaurant, items)
+    .then((order) => confirmOrder(order))
+    .then((order) => assignRider(order))
+    .then((order) => deliverOrder(order))
+    .catch((error) => {
+      return { error: error.message, status: "failed" };
+    });
 }
 
 export function processMultipleOrders(orderList) {
   // Your code here
+  let order = [];
+  if (orderList.length > 0) {
+    orderList.forEach((element) => {
+      order.push(processDelivery(element.restaurant, element.items));
+    });
+  }
+  return Promise.allSettled(order);
 }
+
+console.log(await processDelivery("ok", ["water"]));

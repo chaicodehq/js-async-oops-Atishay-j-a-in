@@ -130,79 +130,191 @@
 export class Player {
   constructor(name, age, team) {
     // Your code here
+    this.trainingHours = 0
+    this.age=age
+    this.name=name
+    this.team=team
   }
 
   getProfile() {
     // Your code here
+    return  {name: this.name, age:this.age, team:this.team, role: "player", trainingHours:this.trainingHours }
   }
 
   train(hours) {
     // Your code here
+    if(hours >0 ){
+      this.trainingHours+=hours
+      return this.trainingHours
+    }
+    return -1
   }
 
   getTrainingHours() {
     // Your code here
+    return this.trainingHours
   }
 }
 
 export class Batsman extends Player {
   constructor(name, age, team, battingStyle) {
     // Your code here
+    super(name, age, team)
+    this.battingStyle = battingStyle 
+    this.innings = []
   }
 
   playInnings(runs, balls) {
     // Your code here
+    if( runs>=0 && balls>0){
+      let strikeRate= (runs/balls)*100
+      let ining={runs, balls, strikeRate}
+      this.innings.push(ining)
+      return ining
+    }
+    return null
   }
 
   getStrikeRate() {
     // Your code here
+    if(this.innings.length>0){
+      let avgInings= 0
+      this.innings.forEach((ele)=>{
+        avgInings+=ele.strikeRate
+      })
+      return avgInings/this.innings.length
+    }
+    return 0
   }
 
   getProfile() {
     // Your code here
+    let totalRuns=0
+     this.innings.forEach((ele)=>{
+      totalRuns+=ele.runs
+     })
+     return {...super.getProfile(), battingStyle:this.battingStyle, role: "batsman",
+        totalRuns,
+        inningsPlayed: this.innings.length}
   }
 }
 
 export class Bowler extends Player {
   constructor(name, age, team, bowlingStyle) {
     // Your code here
+    super(name, age, team)
+    this.bowlingStyle = bowlingStyle 
+    this.spells = []
   }
 
   bowlSpell(wickets, runsConceded, overs) {
     // Your code here
+    if(wickets>=0 && runsConceded >=0 && overs>0){
+      let economy = runsConceded/overs
+      let eco = {wickets,runsConceded,overs,economy}
+      this.spells.push(eco)
+      return eco
+    }
+    return null
   }
 
   getEconomy() {
     // Your code here
+    if(this.spells.length>0){
+      let eco = 0
+      this.spells.forEach((element) => {
+          eco+=element.economy
+      });
+      return eco/this.spells.length
+    }
+    return 0
   }
 
   getProfile() {
     // Your code here
+    let totalWickets=0
+    this.spells.forEach(ele=>{
+      totalWickets+=ele.wickets
+    })
+
+    return { ...super.getProfile(), bowlingStyle:this.bowlingStyle, role: "bowler",
+       totalWickets,
+       spellsBowled: this.spells.length}
   }
 }
 
 export class AllRounder extends Player {
   constructor(name, age, team, battingStyle, bowlingStyle) {
     // Your code here
+    super(name, age, team)
+    this.battingStyle = battingStyle
+    this.bowlingStyle= bowlingStyle 
+    this.innings = []
+    this.spells = []
   }
-
   playInnings(runs, balls) {
     // Your code here
-  }
-
-  bowlSpell(wickets, runsConceded, overs) {
-    // Your code here
+    if( runs>=0 && balls>0){
+      let strikeRate= (runs/balls)*100
+      let ining={runs, balls, strikeRate}
+      this.innings.push(ining)
+      return ining
+    }
+    return null
   }
 
   getStrikeRate() {
     // Your code here
+    if(this.innings.length>0){
+      let avgInings= 0
+      this.innings.forEach((ele)=>{
+        avgInings+=ele.strikeRate
+      })
+      return avgInings/this.innings.length
+    }
+    return 0
+  }
+   bowlSpell(wickets, runsConceded, overs) {
+    // Your code here
+    if(wickets>=0 && runsConceded >=0 && overs>0){
+      let economy = runsConceded/overs
+      let eco = {wickets,runsConceded,overs,economy}
+      this.spells.push(eco)
+      return eco
+    }
+    return null
   }
 
   getEconomy() {
     // Your code here
+    if(this.spells.length>0){
+      let eco = 0
+      this.spells.forEach((element) => {
+          eco+=element.economy
+      });
+      console.log(eco)
+      return eco/this.spells.length
+    }
+    return 0
   }
 
   getProfile() {
     // Your code here
+    let totalWickets=0
+    this.spells.forEach(ele=>{
+      totalWickets+=ele.wickets
+    })
+     let totalRuns=0
+     this.innings.forEach((ele)=>{
+      totalRuns+=ele.runs
+     })
+    return { ...super.getProfile(),battingStyle:this.battingStyle,
+        totalRuns,
+        inningsPlayed: this.innings.length, bowlingStyle:this.bowlingStyle, role: "allrounder",
+       totalWickets,
+       spellsBowled: this.spells.length}
   }
 }
+
+ const ar = new AllRounder('Hardik', 30, 'India', 'right-hand', 'medium');
+ console.log(ar.getEconomy())

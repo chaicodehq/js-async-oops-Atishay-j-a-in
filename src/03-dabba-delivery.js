@@ -1,3 +1,5 @@
+
+
 /**
  * 🍱 Mumbai ka Dabbawala Service - ES6 Classes
  *
@@ -77,29 +79,103 @@
 export class DabbaService {
   constructor(serviceName, area) {
     // Your code here
+    this.serviceName = serviceName
+    this.area = area
+    this.customers = []
+    this._nextId = 1 
   }
 
   addCustomer(name, address, mealPreference) {
     // Your code here
+    mealPreference=mealPreference.toLowerCase()
+    if(["veg", "nonveg", "jain"].includes(mealPreference)){
+      let isExist= false
+      this.customers.forEach((ele)=>{
+        if(ele.name===name){
+          isExist=true
+        }
+      })
+      if(!isExist){
+        let customer={id: this._nextId++, name, address, mealPreference,
+        active: true, delivered: false}
+        this.customers.push(customer)
+        return customer
+      }
+      
+    }
+    return null
   }
 
   removeCustomer(name) {
     // Your code here
+    let isInactive= false
+    this.customers.forEach((ele)=>{
+      if(ele.name === name && ele.active){
+
+        ele.active=false
+        isInactive=true
+      }
+    })
+    return isInactive
+
+
   }
 
   createDeliveryBatch() {
     // Your code here
+    let delivery= []
+    this.customers.forEach((ele)=>{
+      if(ele.active){
+        ele.delivered=false
+        delivery.push({customerId: ele.id, name:ele.name, address:ele.address, mealPreference:ele.mealPreference,
+        batchTime: new Date().toISOString() })
+      }
+    })
+    return delivery
   }
 
   markDelivered(customerId) {
     // Your code here
+    let isMarked = false
+    this.customers.forEach((ele)=>{
+      if(ele.id===customerId && ele.active){
+        isMarked=true
+        ele.delivered=true
+      } 
+    })
+    return isMarked
   }
 
   getDailyReport() {
     // Your code here
+    let active= this.customers.filter((ele)=>{
+      return ele.active
+    })
+    let deliver = active.filter((ele)=>{
+      return ele.delivered
+    })
+    let jain = active.filter((ele)=>{
+      return ele.mealPreference==="jain"
+    })
+    let veg = active.filter((ele)=>{
+      return ele.mealPreference==="veg"
+    })
+
+    return {
+      totalCustomers: active.length,
+          delivered: deliver.length,
+          pending: active.length-deliver.length, mealBreakdown: { veg: veg.length, nonveg: active.length - veg.length - jain.length, jain: jain.length }
+    }
   }
 
   getCustomer(name) {
     // Your code here
+    let customer =null
+    this.customers.forEach((ele)=>{
+      if(ele.name === name){
+        customer=ele
+      }
+    })
+    return customer
   }
 }

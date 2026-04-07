@@ -73,15 +73,86 @@
  */
 export function LassiStand(name, city) {
   // Your code here
+  this.name = name
+  this.city = city
+  this.menu = [] 
+  this.orders = []
+  this._nextOrderId = 1 
+  
 }
 
 // Add prototype methods here:
-// LassiStand.prototype.addFlavor = function(flavor, price) { ... }
-// LassiStand.prototype.takeOrder = function(customerName, flavor, quantity) { ... }
-// LassiStand.prototype.completeOrder = function(orderId) { ... }
-// LassiStand.prototype.getRevenue = function() { ... }
-// LassiStand.prototype.getMenu = function() { ... }
+LassiStand.prototype.addFlavor = function(flavor, price) { 
+  if(price>0 && typeof flavor == "string"){
+    let isExist= false
+    this.menu.forEach((ele)=>{
+
+      if( ele.flavor==flavor){
+        isExist=true
+      }
+    })
+    if(!isExist){
+      this.menu.push({flavor,price})
+      return this.menu.length
+    }
+  }
+  return -1
+}
+LassiStand.prototype.takeOrder = function(customerName, flavor, quantity) { 
+    let price = 0
+    this.menu.forEach((ele)=>{
+      if( ele.flavor){
+        
+        price = ele.price
+      }
+    })
+    
+    if( quantity>0 && price > 0){
+      
+      let price = 0
+      this.menu.forEach((ele)=>{
+        if(ele.flavor==flavor){
+          price= ele.price
+        }
+      })
+      console.log(price)
+      let order ={ id: this._nextOrderId++, customer: customerName, flavor, quantity, total: price * quantity, status: "pending" }
+      this.orders.push(order)
+      return order.id
+    }
+    return -1
+ }
+LassiStand.prototype.completeOrder = function(orderId) { 
+  let isComplete =false
+   this.orders.forEach((ele)=>{
+    if(ele.id === orderId){
+      if( ele.status === "pending"){
+        isComplete=true
+        ele.status= "completed"
+      }
+    }
+   })
+   return isComplete
+ }
+LassiStand.prototype.getRevenue = function() { 
+  let total=0
+  this.orders.forEach((ele)=>{
+    if( ele.status==="completed"){
+      total+= ele.total
+    }
+  })
+  return total
+}
+LassiStand.prototype.getMenu = function() { 
+  return Array.from(this.menu)
+ }
 
 export function isLassiStand(obj) {
   // Your code here
+  return obj instanceof LassiStand
 }
+const stand = new LassiStand('Sardar ji', 'Amritsar');
+stand.addFlavor('mango', 40);
+stand.addFlavor('mango', 45)
+stand.takeOrder("rahul","mango",3)
+console.log(stand)
